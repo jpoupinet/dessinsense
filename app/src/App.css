@@ -1,3 +1,31 @@
 html, body {
   height: 100%;
 }
+
+#root {
+  height: 100%;
+  width: 100%;
+}
+
+#accueil {
+  height: 100%;
+  width: 100%;
+}
+
+#accueil form {
+  display: flex;
+  flex-direction: column;
+  height: 80%;
+  width: 100%;
+  align-items: center;
+  justify-content: center;
+}
+
+#accueil form input {
+  margin: 10px;
+}
+
+button, input[type=submit] {
+  margin: 5px;
+  padding: 10px 20px 10px 20px;
+}

@@ -9,7 +9,7 @@ const WebSocketContext = createContext(null);
 
 export { WebSocketContext };
 
-export default ({ children }) => {
+export default function Websocket({ children }) {
   let socket;
   let ws;
 
@@ -24,7 +24,7 @@ export default ({ children }) => {
       },
       connectTime: Date.now()
     };
-    socket.emit('connectToRoom', JSON.stringify(data));
+    socket.emit('connectToRoom', data);
     dispatch(connectToRoom(data));
   };
 
@@ -36,8 +36,7 @@ export default ({ children }) => {
     socket = io.connect(API_URL);
 
     socket.on('gameStateChange', gameData => {
-      const data = JSON.parse(gameData);
-      dispatch(updateGameData(data));
+      dispatch(updateGameData(gameData));
     });
 
     ws = {
@@ -52,4 +51,4 @@ export default ({ children }) => {
       {children}
     </WebSocketContext.Provider>
   );
-};
+}
