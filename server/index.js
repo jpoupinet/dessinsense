@@ -8,7 +8,7 @@ const fs = require('fs-extra');
 
 server.listen(process.env.PORT);
 
-app.get('/', (req, res) => res.send('Just One API'));
+app.get('/', (req, res) => res.send('Dessin Sensé API'));
 
 const getGameData = idGame => {
   try {
@@ -96,9 +96,7 @@ io.on('connection', socket => {
     }
 
     writeGameData(data.idGame, gameData);
-    socket.emit('connectedToRoom', {
-      curPlayer: gameData.players[playerIndex], ...gameData
-    });
+
     io.sockets.in(data.idGame).emit('gameStateChange', gameData);
   });
 
