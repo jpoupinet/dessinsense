@@ -1,4 +1,4 @@
-import { CONNECT_TO_ROOM, UPDATE_GAME_DATA } from './actions';
+import { CONNECT_TO_ROOM, UPDATE_GAME_DATA, ROOM_ALREADY_EXISTS } from './actions';
 
 const initialState = {
   idGame: null,
@@ -20,7 +20,12 @@ export default function roomReducer(state = initialState, action) {
       return {
         ...state,
         gameData: action.data
-      }
+      };
+    case ROOM_ALREADY_EXISTS:
+      return {
+        ...state,
+        idGame: null
+      };
     default:
       return state;
   };

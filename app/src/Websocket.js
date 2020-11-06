@@ -2,8 +2,7 @@ import React, { createContext } from 'react';
 import io from 'socket.io-client';
 import { API_URL } from './config';
 import { useDispatch } from 'react-redux';
-import { connectToRoom } from './actions';
-import { updateGameData } from './actions';
+import { connectToRoom, updateGameData, roomAlreadyExists } from './actions';
 
 const WebSocketContext = createContext(null);
 
@@ -34,6 +33,10 @@ export default function Websocket({ children }) {
 
   if (!socket) {
     socket = io.connect(API_URL);
+
+    socket.on('roomAlreadyExists', () => {
+      dispatch(roomAlreadyExists());
+    });
 
     socket.on('gameStateChange', gameData => {
       dispatch(updateGameData(gameData));
