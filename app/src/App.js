@@ -6,13 +6,18 @@ import {
   useParams,
   Redirect
 } from 'react-router-dom';
-import { Provider, useSelector } from 'react-redux';
+import { Provider, useSelector, useDispatch } from 'react-redux';
+import { PersistGate } from 'redux-persist/integration/react';
 import { v4 as uuidv4 } from 'uuid';
+import { fabric } from 'fabric';
 
 import WebSocketProvider, { WebSocketContext } from './Websocket';
-import store from './store';
+import createStore from './store';
+import { updateGameData } from './actions';
 
 import './App.css';
+
+const mod = (n, m) => ((n % m) + m) % m;
 
 const PlayerList = ({ players, idPlayer }) => {
   return (
@@ -37,30 +42,83 @@ const PlayerList = ({ players, idPlayer }) => {
 };
 
 const Game = () => {
+  const roomName = useParams().roomName;
   const idGame = useSelector(state => state.idGame);
   const userToken = useSelector(state => state.userToken);
   const gameData = useSelector(state => state.gameData);
 
+  const [gameInit, setGameInit] = useState(false);
   const [showPlayers, setShowPlayers] = useState(true);
   const [cardSubmitted, setCardSubmitted] = useState(false);
+  const [card, setCard] = useState('');
+
+  const dispatch = useDispatch();
+  const ws = useContext(WebSocketContext);
 
   const curPlayer = gameData ? gameData.players.find(p => p.id === userToken.id) : null;
 
-  const startGame = () => {
+  const previousCard = gameData  && gameData.gameState.round > 1 ?
+    gameData.gameState.sequences[
+      mod(
+        gameData.players.findIndex(p => p.id === userToken.id) -
+        (gameData.gameState.round - 1),
+        gameData.players.length
+      )
+    ].sequence[gameData.gameState.round - 2]
+    :
+    null;
 
+  const zoneDessin = new fabric.Canvas('zoneDessin', {
+    isDrawingMode: true
+  });
+  zoneDessin.freeDrawingBrush.width = 5;
+
+  const zoneDessinFixe = new fabric.StaticCanvas('zoneDessinFixe');
+  if (gameData && gameData.gameState.round > 1 && gameData.gameState.round % 2 !== 0) {
+    zoneDessinFixe.loadFromJSON(previousCard.value);
+  }
+
+  const handleTextCard = event => {
+    setCard(event.target.value);
   };
+
+  const handleSubmitCard = event => {
+    event.preventDefault();
+    ws.wsSubmitCard(card);
+    setCardSubmitted(true);
+    setCard('');
+  }
+
+  if (roomName !== idGame && userToken) {
+    dispatch(updateGameData(null));
+    ws.wsConnectToRoom(roomName, userToken.id, userToken.name);
+    return (<div></div>);
+  }
+
+  if (!userToken) {
+    return (<div>{!idGame && <Redirect to={'/' + roomName} />}</div>);
+  }
+
+  if (!gameInit) {
+    ws.wsConnectToRoom(roomName, userToken.id, userToken.name);
+    setGameInit(true);
+    return (<div></div>);
+  }
+
+  if (!gameData) {
+    return (<div></div>);
+  }
 
   return (
     <div id="game">
-      {!idGame && <Redirect to={'/'} />}
       {
-        gameData && showPlayers &&
-        <PlayerList players={players} idPlayer={userToken.id} />
+        showPlayers &&
+        <PlayerList players={gameData.players} idPlayer={userToken.id} />
       }
       <div id="gameZone">
         {
           // Lobby
-          gameData && !gameData.started &&
+          !gameData.gameState.started &&
           <div>
             <h1>Dessin Sensé</h1>
             <h3>3 joueurs minimum</h3>
@@ -78,7 +136,7 @@ const Game = () => {
               </label>
             </p>
             <button
-              onClick={() => startGame()}
+              onClick={() => ws.wsStartGame()}
               disabled={!curPlayer.master}
             >
               Commencer
@@ -89,7 +147,7 @@ const Game = () => {
             }
             {
               curPlayer.master &&
-              players.map(p => p.online).length < 3 &&
+              gameData.players.map(p => p.online).length < 3 &&
               <p className="message-rouge">
                 {`Il faut au moins 3 joueurs connectés 
                   avant de pouvoir lancer la partie.`}
@@ -99,23 +157,58 @@ const Game = () => {
         }
         {
           // Phase texte
-          gameData && gameData.started && gameData.round % 2 !== 0 &&
-          <div></div>
+          gameData.gameState.started &&
+          gameData.gameState.round % 2 !== 0 &&
+          !cardSubmitted &&
+            <div>
+              {
+                gameData.gameState.round > 1 &&
+                <canvas id="zoneDessinFixe" />
+              }
+              <form onSubmit={handleSubmitCard}>
+                <p>
+                  <label>
+                    {
+                      gameData.gameState.round === 1 ?
+                        'Entrez une phrase qu\'un autre joueur devra dessiner : '
+                        :
+                        'Ecrivez ce que vous voyez sur ce dessin : '
+                    }
+                    <textarea
+                      value={card}
+                      onChange={handleTextCard}
+                    />
+                  </label>
+                </p>
+                <input type="submit" value="Valider" />
+              </form>
+            </div>
         }
         {
           // Phase dessin
-          gameData && gameData.started && gameData.round % 2 === 0 &&
-          <div></div>
+          gameData.gameState.started &&
+          gameData.gameState.round % 2 === 0 &&
+          !cardSubmitted &&
+          <div>
+            <p>La phrase à dessiner est : </p>
+            <h2>{previousCard.value}</h2>
+            <canvas id="zoneDessin" />
+            <button onClick={() => {
+              console.log(JSON.stringify(zoneDessin));
+              // ws.wsSubmitCard(JSON.stringify(zoneDessin));
+              setCardSubmitted(true);
+            }}>Envoyer</button>
+          </div>
         }
         {
           // En attente d'autres joueurs
-          gameData && !gameData.started && cardSubmitted &&
-          <div></div>
+          gameData.gameState.started && cardSubmitted &&
+          <div>En attente ...</div>
         }
         {
           // Fin de la partie
-          gameData && gameData.started && gameData.finished &&
-          <div></div>
+          gameData.gameState.started && gameData.finished &&
+          <div>Fini</div>
         }
       </div>
     </div>
@@ -174,23 +267,27 @@ const Accueil = () => {
 };
 
 const App = () => {
+  const { store, persistor } = createStore();
+
   return (
     <Provider store={store}>
-      <WebSocketProvider>
-        <Router>
-          <Switch>
-            <Route exact path="/">
-              <Accueil />
-            </Route>
-            <Route exact path="/:roomName">
-              <Accueil />
-            </Route>
-            <Route path="/game/:roomName">
-              <Game />
-            </Route>
-          </Switch>
-        </Router>
-      </WebSocketProvider>
+      <PersistGate loading={null} persistor={persistor}>
+        <WebSocketProvider>
+          <Router>
+            <Switch>
+              <Route exact path="/">
+                <Accueil />
+              </Route>
+              <Route exact path="/:roomName">
+                <Accueil />
+              </Route>
+              <Route path="/game/:roomName">
+                <Game />
+              </Route>
+            </Switch>
+          </Router>
+        </WebSocketProvider>
+      </PersistGate>
     </Provider>
   );
 }

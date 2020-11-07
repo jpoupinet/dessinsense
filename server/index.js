@@ -10,6 +10,8 @@ server.listen(process.env.PORT);
 
 app.get('/', (req, res) => res.send('Dessin Sensé API'));
 
+const mod = (n, m) => ((n % m) + m) % m;
+
 const getGameData = idGame => {
   try {
     return JSON.parse(fs.readFileSync('games/' + idGame + '.json', 'utf-8'));
@@ -122,15 +124,15 @@ io.on('connection', socket => {
 
     if (!gameData.players.find(p => p.id === socket.playerId).master) return;
 
-    if (gameData.players.filter(p => p.online).length < 2) return;
+    if (gameData.players.filter(p => p.online).length < 3) return;
 
     gameData.players = gameData.players.filter(p => p.online);
 
-    gameData.gameState.sequences.push(gameData.players.map(p => ({
+    gameData.gameState.sequences = gameData.players.map(p => ({
       playerId: p.id,
       playerName: p.name,
       sequence: []
-    })));
+    }));
 
     gameData.gameState.started = true;
     gameData.gameState.round = 1;
@@ -142,15 +144,21 @@ io.on('connection', socket => {
   socket.on('submitCard', card => {
     if (!socket.idGame) return;
     let gameData = getGameData(socket.idGame);
+
     if (!checkPlayersOnline(gameData.players)) return;
 
     const round = gameData.gameState.round;
-    const indexSequence =
-      gameData.gameState.sequences.findIndex(seq => seq.playerId === socket.playerId);
+    const playerIndex = gameData.players.findIndex(p => p.id === socket.playerId);
+
+    const indexSequence = round === 1 ?
+      gameData.gameState.sequences.findIndex(seq => seq.playerId === socket.playerId)
+      :
+      mod(playerIndex - (round - 1), gameData.players.length);
 
     if (indexSequence === -1) return;
 
     gameData.gameState.sequences[indexSequence].sequence.push({
+      submitterId: socket.playerId,
       submitterName: socket.playerName,
       type: round % 2 === 0 ? 'dessin' : 'texte',
       value: card

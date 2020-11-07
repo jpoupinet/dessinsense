@@ -27,8 +27,12 @@ export default function Websocket({ children }) {
     dispatch(connectToRoom(data));
   };
 
-  const wsUpdateGameData = data => {
-    dispatch(updateGameData(data));
+  const wsStartGame = () => {
+    socket.emit('startGame');
+  };
+
+  const wsSubmitCard = card => {
+    socket.emit('submitCard', card);
   };
 
   if (!socket) {
@@ -45,7 +49,8 @@ export default function Websocket({ children }) {
     ws = {
       socket,
       wsConnectToRoom,
-      wsUpdateGameData
+      wsStartGame,
+      wsSubmitCard
     };
   }
 

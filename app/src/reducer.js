@@ -12,9 +12,9 @@ export default function roomReducer(state = initialState, action) {
     case CONNECT_TO_ROOM:
       return {
         ...state,
-        idGame: action.idGame,
-        userToken: action.userToken,
-        connectTime: action.connectTime
+        idGame: action.data.idGame,
+        userToken: action.data.userToken,
+        connectTime: action.data.connectTime
       };
     case UPDATE_GAME_DATA:
       return {
