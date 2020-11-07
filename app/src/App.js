@@ -49,15 +49,44 @@ const Game = () => {
 
   const [gameInit, setGameInit] = useState(false);
   const [showPlayers, setShowPlayers] = useState(true);
-  const [cardSubmitted, setCardSubmitted] = useState(false);
   const [card, setCard] = useState('');
 
   const dispatch = useDispatch();
   const ws = useContext(WebSocketContext);
 
-  const curPlayer = gameData ? gameData.players.find(p => p.id === userToken.id) : null;
+  if (roomName !== idGame && userToken) {
+    dispatch(updateGameData(null));
+    ws.wsConnectToRoom(roomName, userToken.id, userToken.name);
+    return (<div></div>);
+  }
 
-  const previousCard = gameData  && gameData.gameState.round > 1 ?
+  if (!userToken) {
+    return (<div>{!idGame && <Redirect to={'/' + roomName} />}</div>);
+  }
+
+  if (!gameInit) {
+    ws.wsConnectToRoom(roomName, userToken.id, userToken.name);
+    setGameInit(true);
+    return (<div></div>);
+  }
+
+  if (!gameData) {
+    return (<div></div>);
+  }
+  
+  const curPlayer = gameData ? gameData.players.find(p => p.id === userToken.id) : null;
+  const cardSubmitted = gameData.gameState.started ?
+    gameData.gameState.sequences[
+      mod(
+        gameData.players.findIndex(p => p.id === userToken.id) -
+        (gameData.gameState.round - 1),
+        gameData.players.length
+      )
+    ].sequence.findIndex(seq => seq.submitterId === userToken.id) !== -1
+    :
+    null;
+
+  const previousCard = gameData && gameData.gameState.round > 1 ?
     gameData.gameState.sequences[
       mod(
         gameData.players.findIndex(p => p.id === userToken.id) -
@@ -85,28 +114,7 @@ const Game = () => {
   const handleSubmitCard = event => {
     event.preventDefault();
     ws.wsSubmitCard(card);
-    setCardSubmitted(true);
     setCard('');
-  }
-
-  if (roomName !== idGame && userToken) {
-    dispatch(updateGameData(null));
-    ws.wsConnectToRoom(roomName, userToken.id, userToken.name);
-    return (<div></div>);
-  }
-
-  if (!userToken) {
-    return (<div>{!idGame && <Redirect to={'/' + roomName} />}</div>);
-  }
-
-  if (!gameInit) {
-    ws.wsConnectToRoom(roomName, userToken.id, userToken.name);
-    setGameInit(true);
-    return (<div></div>);
-  }
-
-  if (!gameData) {
-    return (<div></div>);
   }
 
   return (
@@ -196,7 +204,6 @@ const Game = () => {
             <button onClick={() => {
               console.log(JSON.stringify(zoneDessin));
               // ws.wsSubmitCard(JSON.stringify(zoneDessin));
-              setCardSubmitted(true);
             }}>Envoyer</button>
           </div>
         }
