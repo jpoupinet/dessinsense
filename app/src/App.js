@@ -219,8 +219,97 @@ const Game = () => {
         }
         {
           // Fin de la partie
-          gameData.gameState.started && gameData.gameState.finished &&
-          <div>Fini</div>
+          gameData.gameState.started &&
+          gameData.gameState.finished &&
+          !gameData.gameState.currentSequence &&
+          <div>
+            <h2>Fin de la partie !</h2>
+            <h3>
+              Le créateur de la partie 
+              ({gameData.players.find(p => p.master).name}) 
+              va choisir une séquence à afficher.
+            </h3>
+            {
+              gameData.gameState.sequences.map(s =>
+                <button
+                  onClick={() => ws.wsSetCurrentSequence(s.playerId)}
+                  key={'sequence' + s.playerId}
+                  disabled={!curPlayer.master}
+                >
+                  Séquence de {s.playerName}
+                </button>
+              )
+            }
+            {
+              <div>
+                <button
+                  onClick={() => ws.wsStartGame()}
+                  disabled={!curPlayer.master}
+                >
+                  Faire une nouvelle partie
+                </button>
+              </div>
+            }
+          </div>
+        }
+        {
+          // Affichage séquence
+          gameData.gameState.started &&
+          gameData.gameState.finished &&
+          gameData.gameState.currentSequence &&
+          <div>
+            <h2>Séquence de {gameData.gameState.currentSequence.playerName}</h2>
+            {
+              gameData.gameState.currentSequence.sequence.map((seq, i) => {
+                if (i === 0) {
+                  return (
+                    <div>
+                      <h3>Phrase de départ :</h3>
+                      <h3>{seq.value}</h3>
+                    </div>
+                  );
+                }
+
+                if (i % 2 !== 0) {
+                  // Dessin
+                  return (
+                    <div>
+                      <p>Dessin de {seq.submitterName}</p>
+                      <Stage width={500} height={300}>
+                        <Layer>
+                          {seq.value.map((line, i) => (
+                            <Line
+                              key={i}
+                              points={line.points}
+                              stroke="#0a0a0a"
+                              strokeWidth={3}
+                              tension={0.5}
+                              lineCap="round"
+                              globalCompositeOperation={'source-over'}
+                            />
+                          ))}
+                        </Layer>
+                      </Stage>
+                    </div>
+                  );
+                } else {
+                  // Texte
+                  return (
+                    <div>
+                      <p>Phrase de {seq.submitterName}</p>
+                      <p>{seq.value}</p>
+                    </div>
+                  )
+                }
+              })
+            }
+            <button
+              onClick={() => ws.wsSetCurrentSequence(null)}
+              disabled={!curPlayer.master}
+            >
+              Choisir une autre séquence
+            </button>
+          </div>
         }
       </div>
     </div>

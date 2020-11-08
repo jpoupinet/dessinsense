@@ -35,6 +35,10 @@ export default function Websocket({ children }) {
     socket.emit('submitCard', card);
   };
 
+  const wsSetCurrentSequence = seqPlayerId => {
+    socket.emit('setCurrentSequence', seqPlayerId);
+  };
+
   if (!socket) {
     socket = io.connect(API_URL);
 
@@ -50,7 +54,8 @@ export default function Websocket({ children }) {
       socket,
       wsConnectToRoom,
       wsStartGame,
-      wsSubmitCard
+      wsSubmitCard,
+      wsSetCurrentSequence
     };
   }
 
