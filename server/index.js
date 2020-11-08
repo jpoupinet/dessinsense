@@ -4,7 +4,7 @@ const express = require('express');
 const app = express();
 const fs = require('fs-extra');
 
-const server = require('http').Server(app);
+// const server = require('http').Server(app);
 
 const https = require('https');
 const options = {
