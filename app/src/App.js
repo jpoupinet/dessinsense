@@ -9,8 +9,9 @@ import {
 import { Provider, useSelector, useDispatch } from 'react-redux';
 import { PersistGate } from 'redux-persist/integration/react';
 import { v4 as uuidv4 } from 'uuid';
-import { fabric } from 'fabric';
+import { Stage, Layer, Line } from 'react-konva';
 
+import Drawing from './Drawing';
 import WebSocketProvider, { WebSocketContext } from './Websocket';
 import createStore from './store';
 import { updateGameData } from './actions';
@@ -97,25 +98,19 @@ const Game = () => {
     :
     null;
 
-  const zoneDessin = new fabric.Canvas('zoneDessin', {
-    isDrawingMode: true
-  });
-  zoneDessin.freeDrawingBrush.width = 5;
-
-  const zoneDessinFixe = new fabric.StaticCanvas('zoneDessinFixe');
-  if (gameData && gameData.gameState.round > 1 && gameData.gameState.round % 2 !== 0) {
-    zoneDessinFixe.loadFromJSON(previousCard.value);
-  }
-
   const handleTextCard = event => {
     setCard(event.target.value);
   };
 
-  const handleSubmitCard = event => {
+  const handleSubmitTextCard = event => {
     event.preventDefault();
     ws.wsSubmitCard(card);
     setCard('');
-  }
+  };
+
+  const handleSubmitDrawCard = card => {
+    ws.wsSubmitCard(card);
+  };
 
   return (
     <div id="game">
@@ -171,9 +166,23 @@ const Game = () => {
             <div>
               {
                 gameData.gameState.round > 1 &&
-                <canvas id="zoneDessinFixe" />
+                <Stage width={500} height={300}>
+                  <Layer>
+                    {previousCard.value.map((line, i) => (
+                      <Line
+                        key={i}
+                        points={line.points}
+                        stroke="#0a0a0a"
+                        strokeWidth={3}
+                        tension={0.5}
+                        lineCap="round"
+                        globalCompositeOperation={'source-over'}
+                      />
+                    ))}
+                  </Layer>
+                </Stage>
               }
-              <form onSubmit={handleSubmitCard}>
+              <form onSubmit={handleSubmitTextCard}>
                 <p>
                   <label>
                     {
@@ -200,21 +209,17 @@ const Game = () => {
           <div>
             <p>La phrase à dessiner est : </p>
             <h2>{previousCard.value}</h2>
-            <canvas id="zoneDessin" />
-            <button onClick={() => {
-              console.log(JSON.stringify(zoneDessin));
-              // ws.wsSubmitCard(JSON.stringify(zoneDessin));
-            }}>Envoyer</button>
+            <Drawing submit={card => handleSubmitDrawCard(card)} />
           </div>
         }
         {
           // En attente d'autres joueurs
-          gameData.gameState.started && cardSubmitted &&
+          gameData.gameState.started && cardSubmitted && !gameData.gameState.finished &&
           <div>En attente ...</div>
         }
         {
           // Fin de la partie
-          gameData.gameState.started && gameData.finished &&
+          gameData.gameState.started && gameData.gameState.finished &&
           <div>Fini</div>
         }
       </div>
