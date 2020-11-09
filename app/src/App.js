@@ -173,7 +173,7 @@ const Game = () => {
               {
                 gameData.gameState.round > 1 &&
                 <div className="card">
-                  <Stage width={500} height={300}>
+                  <Stage width={600} height={350}>
                     <Layer>
                       {previousCard.value.map((line, i) => (
                         <Line
@@ -268,23 +268,38 @@ const Game = () => {
           gameData.gameState.currentSequence &&
           <div>
             <h2>Séquence de {gameData.gameState.currentSequence.sequence.playerName}</h2>
-            <div>
-              <h3>Phrase de départ :</h3>
-              <p className="card">
-                {gameData.gameState.currentSequence.sequence.sequence[0].value}
-              </p>
-            </div>
+            <button
+              style={{
+                display: gameData.gameState.currentSequence.nbCardsToShow >= 
+                  gameData.gameState.currentSequence.sequence.sequence.length ?
+                  'none' : 'inline'
+              }}
+              onClick={() => ws.wsSetCurrentSequence(
+                gameData.gameState.currentSequence.sequence.playerId,
+                gameData.gameState.currentSequence.nbCardsToShow + 1
+              )}
+              disabled={!curPlayer.master}
+            >
+              Suite
+            </button>
+            <button
+              onClick={() => ws.wsSetCurrentSequence()}
+              disabled={!curPlayer.master}
+            >
+              Choisir une autre séquence
+            </button>
             {
               gameData.gameState.currentSequence.sequence.sequence
                 .slice(1, gameData.gameState.currentSequence.nbCardsToShow)
+                .reverse()
                 .map(seq => {
                   // Dessin
                   if (seq.type === 'dessin') {
                     return (
-                      <div>
+                      <div key={'seq' + seq.submitterId}>
                         <p>Dessin de {seq.submitterName}</p>
                         <div className="card">
-                          <Stage width={500} height={300}>
+                          <Stage width={600} height={350}>
                             <Layer>
                               {seq.value.map((line, i) => (
                                 <Line
@@ -306,33 +321,19 @@ const Game = () => {
 
                   // Texte
                   return (
-                    <div>
+                    <div key={'seq' + seq.submitterId}>
                       <p>Phrase de {seq.submitterName}</p>
                       <p className="card">{seq.value}</p>
                     </div>
                   );
                 })
             }
-            <button
-              style={{
-                display: gameData.gameState.currentSequence.nbCardsToShow >= 
-                  gameData.gameState.currentSequence.sequence.sequence.length ?
-                  'none' : 'block'
-              }}
-              onClick={() => ws.wsSetCurrentSequence(
-                gameData.gameState.currentSequence.sequence.playerId,
-                gameData.gameState.currentSequence.nbCardsToShow + 1
-              )}
-              disabled={!curPlayer.master}
-            >
-              Suite
-            </button>
-            <button
-              onClick={() => ws.wsSetCurrentSequence()}
-              disabled={!curPlayer.master}
-            >
-              Choisir une autre séquence
-            </button>
+            <div>
+              <h3>Phrase de départ :</h3>
+              <p className="card">
+                {gameData.gameState.currentSequence.sequence.sequence[0].value}
+              </p>
+            </div>
           </div>
         }
       </div>

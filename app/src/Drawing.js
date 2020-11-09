@@ -33,8 +33,8 @@ const Drawing = props => {
   return (
     <div className="card">
       <Stage
-        width={700}
-        height={400}
+        width={600}
+        height={350}
         onMouseDown={handleMouseDown}
         onMousemove={handleMouseMove}
         onMouseup={handleMouseUp}
