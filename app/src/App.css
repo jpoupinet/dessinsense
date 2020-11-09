@@ -29,3 +29,63 @@ button, input[type=submit] {
   margin: 5px;
   padding: 10px 20px 10px 20px;
 }
+
+#game {
+  display: flex;
+  flex-direction: row;
+  height: 100%;
+  width: 100%;
+}
+
+#showPlayers {
+  border: none;
+  background-color: rgba(255, 255, 255, 0);
+  margin: 0px;
+  height: 50px;
+}
+
+#players {
+  flex: 1;
+  height: 100%;
+  padding: 10px;
+  border-right: 1px solid #ccc;
+}
+
+#players #header {
+  font-size: large;
+  margin-bottom: 40px;
+}
+
+#players #curPlayer {
+  font-weight: bold;
+}
+
+#gameZone {
+  flex: 5;
+  padding: 20px;
+}
+
+#gameZone input[type=text] {
+  margin: 10px;
+}
+
+#options {
+  width: 50%;
+  margin-top: 50px;
+}
+
+#lienPartie {
+  width: 300px;
+}
+
+.player {
+  color: #333;
+}
+
+.player-offline {
+  color: #a33;
+}
+
+.bold {
+  font-weight: bold;
+}

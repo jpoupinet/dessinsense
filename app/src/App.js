@@ -118,6 +118,12 @@ const Game = () => {
         showPlayers &&
         <PlayerList players={gameData.players} idPlayer={userToken.id} />
       }
+      <button
+          id="showPlayers"
+          onClick={() => setShowPlayers(!showPlayers)}
+        >
+        {showPlayers ? '◄' : '►'}
+      </button>
       <div id="gameZone">
         {
           // Lobby
