@@ -38,9 +38,18 @@ const Drawing = props => {
         onMouseDown={handleMouseDown}
         onMousemove={handleMouseMove}
         onMouseup={handleMouseUp}
-        onTouchStart={handleMouseDown}
-        onTouchMove={handleMouseMove}
-        onTouchEnd={handleMouseUp}
+        onTouchStart={e => {
+          e.preventDefault();
+          handleMouseDown(e);
+        }}
+        onTouchMove={e => {
+          e.preventDefault();
+          handleMouseMove(e);
+        }}
+        onTouchEnd={e => {
+          e.preventDefault();
+          handleMouseUp(e);
+        }}
       >
         <Layer>
           {lines.map((line, i) => (
