@@ -172,21 +172,23 @@ const Game = () => {
             <div>
               {
                 gameData.gameState.round > 1 &&
-                <Stage width={500} height={300}>
-                  <Layer>
-                    {previousCard.value.map((line, i) => (
-                      <Line
-                        key={i}
-                        points={line.points}
-                        stroke="#0a0a0a"
-                        strokeWidth={3}
-                        tension={0.5}
-                        lineCap="round"
-                        globalCompositeOperation={'source-over'}
-                      />
-                    ))}
-                  </Layer>
-                </Stage>
+                <div className="card">
+                  <Stage width={500} height={300}>
+                    <Layer>
+                      {previousCard.value.map((line, i) => (
+                        <Line
+                          key={i}
+                          points={line.points}
+                          stroke="#0a0a0a"
+                          strokeWidth={3}
+                          tension={0.5}
+                          lineCap="round"
+                          globalCompositeOperation={'source-over'}
+                        />
+                      ))}
+                    </Layer>
+                  </Stage>
+                </div>
               }
               <form onSubmit={handleSubmitTextCard}>
                 <p>
@@ -198,6 +200,7 @@ const Game = () => {
                         'Ecrivez ce que vous voyez sur ce dessin : '
                     }
                     <textarea
+                      className="card"
                       value={card}
                       onChange={handleTextCard}
                     />
@@ -267,7 +270,9 @@ const Game = () => {
             <h2>Séquence de {gameData.gameState.currentSequence.sequence.playerName}</h2>
             <div>
               <h3>Phrase de départ :</h3>
-              <h3>{gameData.gameState.currentSequence.sequence.sequence[0].value}</h3>
+              <p className="card">
+                {gameData.gameState.currentSequence.sequence.sequence[0].value}
+              </p>
             </div>
             {
               gameData.gameState.currentSequence.sequence.sequence
@@ -278,21 +283,23 @@ const Game = () => {
                     return (
                       <div>
                         <p>Dessin de {seq.submitterName}</p>
-                        <Stage width={500} height={300}>
-                          <Layer>
-                            {seq.value.map((line, i) => (
-                              <Line
-                                key={i}
-                                points={line.points}
-                                stroke="#0a0a0a"
-                                strokeWidth={3}
-                                tension={0.5}
-                                lineCap="round"
-                                globalCompositeOperation={'source-over'}
-                              />
-                            ))}
-                          </Layer>
-                        </Stage>
+                        <div className="card">
+                          <Stage width={500} height={300}>
+                            <Layer>
+                              {seq.value.map((line, i) => (
+                                <Line
+                                  key={i}
+                                  points={line.points}
+                                  stroke="#0a0a0a"
+                                  strokeWidth={3}
+                                  tension={0.5}
+                                  lineCap="round"
+                                  globalCompositeOperation={'source-over'}
+                                />
+                              ))}
+                            </Layer>
+                          </Stage>
+                        </div>
                       </div>
                     );
                   }
@@ -301,7 +308,7 @@ const Game = () => {
                   return (
                     <div>
                       <p>Phrase de {seq.submitterName}</p>
-                      <p>{seq.value}</p>
+                      <p className="card">{seq.value}</p>
                     </div>
                   );
                 })

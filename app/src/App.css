@@ -89,3 +89,19 @@ button, input[type=submit] {
 .bold {
   font-weight: bold;
 }
+
+.card {
+  display: block;
+  border: 1px solid #333;
+  width: 700px;
+  height: 400px;
+  margin: 20px 0 20px 0;
+  padding: 5px;
+  resize: none;
+  text-align: center;
+  font-size: 40px;
+}
+
+#submitDessin {
+  margin-top: 20px;
+}

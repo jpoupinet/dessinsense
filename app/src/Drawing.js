@@ -31,10 +31,10 @@ const Drawing = props => {
   };
   
   return (
-    <div>
+    <div className="card">
       <Stage
-        width={500}
-        height={300}
+        width={700}
+        height={400}
         onMouseDown={handleMouseDown}
         onMousemove={handleMouseMove}
         onMouseup={handleMouseUp}
@@ -57,7 +57,7 @@ const Drawing = props => {
           ))}
         </Layer>
       </Stage>
-      <button onClick={() => props.submit(lines)}>Envoyer</button>
+      <button id="submitDessin" onClick={() => props.submit(lines)}>Envoyer</button>
     </div>
   );
 }
