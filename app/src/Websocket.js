@@ -35,8 +35,12 @@ export default function Websocket({ children }) {
     socket.emit('submitCard', card);
   };
 
-  const wsSetCurrentSequence = seqPlayerId => {
-    socket.emit('setCurrentSequence', seqPlayerId);
+  const wsSetCurrentSequence = (seqPlayerId = null, nbCardsToShow = null) => {
+    const payload = {
+      seqPlayerId,
+      nbCardsToShow
+    };
+    socket.emit('setCurrentSequence', payload);
   };
 
   if (!socket) {

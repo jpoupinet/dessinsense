@@ -146,6 +146,7 @@ io.on('connection', socket => {
 
     gameData.gameState.started = true;
     gameData.gameState.finished = false;
+    gameData.gameState.currentSequence = null;
     gameData.gameState.round = 1;
 
     writeGameData(socket.idGame, gameData);
@@ -189,15 +190,28 @@ io.on('connection', socket => {
     io.sockets.in(socket.idGame).emit('gameStateChange', gameData);
   });
 
-  socket.on('setCurrentSequence', seqPlayerId => {
+  socket.on('setCurrentSequence', payload => {
     if (!socket.idGame) return;
     let gameData = getGameData(socket.idGame);
 
     if (!checkPlayersOnline(gameData.players)) return;
     if (!gameData.players.find(p => p.id === socket.playerId).master) return;
 
-    gameData.gameState.currentSequence =
-      gameData.gameState.sequences.find(seq => seq.playerId === seqPlayerId);
+    let currentSequence = null;
+
+    if (payload.seqPlayerId && payload.nbCardsToShow) {
+      const sequenceRequested =
+        gameData.gameState.sequences.find(seq => seq.playerId === payload.seqPlayerId);
+
+      if (payload.nbCardsToShow >= sequenceRequested.length) return;
+
+      currentSequence = {
+        sequence: sequenceRequested,
+        nbCardsToShow: payload.nbCardsToShow
+      };
+    }
+
+    gameData.gameState.currentSequence = currentSequence;
 
     writeGameData(socket.idGame, gameData);
     io.sockets.in(socket.idGame).emit('gameStateChange', gameData);

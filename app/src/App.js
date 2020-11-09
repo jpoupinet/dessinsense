@@ -232,7 +232,7 @@ const Game = () => {
             {
               gameData.gameState.sequences.map(s =>
                 <button
-                  onClick={() => ws.wsSetCurrentSequence(s.playerId)}
+                  onClick={() => ws.wsSetCurrentSequence(s.playerId, 1)}
                   key={'sequence' + s.playerId}
                   disabled={!curPlayer.master}
                 >
@@ -258,53 +258,64 @@ const Game = () => {
           gameData.gameState.finished &&
           gameData.gameState.currentSequence &&
           <div>
-            <h2>Séquence de {gameData.gameState.currentSequence.playerName}</h2>
+            <h2>Séquence de {gameData.gameState.currentSequence.sequence.playerName}</h2>
+            <div>
+              <h3>Phrase de départ :</h3>
+              <h3>{gameData.gameState.currentSequence.sequence.sequence[0].value}</h3>
+            </div>
             {
-              gameData.gameState.currentSequence.sequence.map((seq, i) => {
-                if (i === 0) {
-                  return (
-                    <div>
-                      <h3>Phrase de départ :</h3>
-                      <h3>{seq.value}</h3>
-                    </div>
-                  );
-                }
-
-                if (i % 2 !== 0) {
+              gameData.gameState.currentSequence.sequence.sequence
+                .slice(1, gameData.gameState.currentSequence.nbCardsToShow)
+                .map(seq => {
                   // Dessin
-                  return (
-                    <div>
-                      <p>Dessin de {seq.submitterName}</p>
-                      <Stage width={500} height={300}>
-                        <Layer>
-                          {seq.value.map((line, i) => (
-                            <Line
-                              key={i}
-                              points={line.points}
-                              stroke="#0a0a0a"
-                              strokeWidth={3}
-                              tension={0.5}
-                              lineCap="round"
-                              globalCompositeOperation={'source-over'}
-                            />
-                          ))}
-                        </Layer>
-                      </Stage>
-                    </div>
-                  );
-                } else {
+                  if (seq.type === 'dessin') {
+                    return (
+                      <div>
+                        <p>Dessin de {seq.submitterName}</p>
+                        <Stage width={500} height={300}>
+                          <Layer>
+                            {seq.value.map((line, i) => (
+                              <Line
+                                key={i}
+                                points={line.points}
+                                stroke="#0a0a0a"
+                                strokeWidth={3}
+                                tension={0.5}
+                                lineCap="round"
+                                globalCompositeOperation={'source-over'}
+                              />
+                            ))}
+                          </Layer>
+                        </Stage>
+                      </div>
+                    );
+                  }
+
                   // Texte
                   return (
                     <div>
                       <p>Phrase de {seq.submitterName}</p>
                       <p>{seq.value}</p>
                     </div>
-                  )
-                }
-              })
+                  );
+                })
             }
             <button
-              onClick={() => ws.wsSetCurrentSequence(null)}
+              style={{
+                display: gameData.gameState.currentSequence.nbCardsToShow >= 
+                  gameData.gameState.currentSequence.sequence.sequence.length ?
+                  'none' : 'block'
+              }}
+              onClick={() => ws.wsSetCurrentSequence(
+                gameData.gameState.currentSequence.sequence.playerId,
+                gameData.gameState.currentSequence.nbCardsToShow + 1
+              )}
+              disabled={!curPlayer.master}
+            >
+              Suite
+            </button>
+            <button
+              onClick={() => ws.wsSetCurrentSequence()}
               disabled={!curPlayer.master}
             >
               Choisir une autre séquence
