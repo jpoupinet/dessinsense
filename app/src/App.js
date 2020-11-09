@@ -217,7 +217,7 @@ const Game = () => {
           !cardSubmitted &&
           <div>
             <p>La phrase à dessiner est : </p>
-            <h2>{previousCard.value}</h2>
+            <p class="card">{previousCard.value}</p>
             <Drawing submit={card => handleSubmitDrawCard(card)} />
           </div>
         }
