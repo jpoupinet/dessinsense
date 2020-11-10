@@ -49,7 +49,7 @@ const Game = () => {
   const gameData = useSelector(state => state.gameData);
 
   const [gameInit, setGameInit] = useState(false);
-  const [showPlayers, setShowPlayers] = useState(true);
+  const [showPlayers, setShowPlayers] = useState(false);
   const [card, setCard] = useState('');
 
   const dispatch = useDispatch();
@@ -175,7 +175,7 @@ const Game = () => {
           !cardSubmitted &&
             <div>
               <form onSubmit={handleSubmitTextCard}>
-                <p>
+                <div>
                   { gameData.gameState.round > 1 && 
                     <h3>Séquence de {previousSequence.playerName}</h3> }
                   <label>
@@ -212,7 +212,7 @@ const Game = () => {
                       onChange={handleTextCard}
                     />
                   </label>
-                </p>
+                </div>
                 <input type="submit" value="Valider" />
               </form>
             </div>
@@ -225,7 +225,7 @@ const Game = () => {
           <div>
             <h3>Séquence de {previousSequence.playerName}</h3>
             <p>Dessinez la phrase de {previousCard.submitterName} : </p>
-            <p class="card">{previousCard.value}</p>
+            <p className="card">{previousCard.value}</p>
             <Drawing submit={card => handleSubmitDrawCard(card)} />
           </div>
         }
@@ -240,7 +240,7 @@ const Game = () => {
             .map(seq => seq.sequence[gameData.gameState.round - 1].submitterId)
             .findIndex(id => id === p.id) === -1
           ).map(p => (
-            <p>En attente de {p.name} ...</p>
+            <p key={`attente${p.id}`}>En attente de {p.name} ...</p>
           ))
         }
         {
