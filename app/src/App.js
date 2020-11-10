@@ -152,7 +152,10 @@ const Game = () => {
             </button>
             {
               !curPlayer.master &&
-              <p>{`Seul Le joueur qui a créé la partie peut la lancer.`}</p>
+              <p>
+                Seul Le joueur qui a créé la partie ({gameData.players.find(p => p.master).name}
+                ) peut la lancer.
+              </p>
             }
             {
               curPlayer.master &&
@@ -223,8 +226,17 @@ const Game = () => {
         }
         {
           // En attente d'autres joueurs
-          gameData.gameState.started && cardSubmitted && !gameData.gameState.finished &&
-          <div>En attente ...</div>
+          gameData.gameState.started &&
+          cardSubmitted &&
+          !gameData.gameState.finished &&
+          gameData.players.filter(p =>
+            gameData.gameState.sequences
+            .filter(seq => seq.sequence.length === gameData.gameState.round)
+            .map(seq => seq.sequence[gameData.gameState.round - 1].submitterId)
+            .findIndex(id => id === p.id) === -1
+          ).map(p => (
+            <p>En attente de {p.name} ...</p>
+          ))
         }
         {
           // Fin de la partie
