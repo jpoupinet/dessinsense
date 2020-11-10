@@ -87,16 +87,17 @@ const Game = () => {
     :
     null;
 
-  const previousCard = gameData && gameData.gameState.round > 1 ?
+  const previousSequence = gameData && gameData.gameState.round > 1 ?
     gameData.gameState.sequences[
       mod(
         gameData.players.findIndex(p => p.id === userToken.id) -
         (gameData.gameState.round - 1),
         gameData.players.length
       )
-    ].sequence[gameData.gameState.round - 2]
-    :
-    null;
+    ] : null;
+
+  const previousCard = gameData && gameData.gameState.round > 1 ?
+    previousSequence.sequence[gameData.gameState.round - 2] : null;
 
   const handleTextCard = event => {
     setCard(event.target.value);
@@ -173,34 +174,37 @@ const Game = () => {
           gameData.gameState.round % 2 !== 0 &&
           !cardSubmitted &&
             <div>
-              {
-                gameData.gameState.round > 1 &&
-                <div className="card">
-                  <Stage width={600} height={350}>
-                    <Layer>
-                      {previousCard.value.map((line, i) => (
-                        <Line
-                          key={i}
-                          points={line.points}
-                          stroke="#0a0a0a"
-                          strokeWidth={3}
-                          tension={0.5}
-                          lineCap="round"
-                          globalCompositeOperation={'source-over'}
-                        />
-                      ))}
-                    </Layer>
-                  </Stage>
-                </div>
-              }
               <form onSubmit={handleSubmitTextCard}>
                 <p>
+                  { gameData.gameState.round > 1 && 
+                    <h3>Séquence de {previousSequence.playerName}</h3> }
                   <label>
                     {
                       gameData.gameState.round === 1 ?
                         'Entrez une phrase qu\'un autre joueur devra dessiner : '
                         :
-                        'Ecrivez ce que vous voyez sur ce dessin : '
+                        `Ecrivez ce que vous voyez sur ce dessin de 
+                          ${previousCard.submitterName} : `
+                    }
+                    {
+                      gameData.gameState.round > 1 &&
+                      <div className="card">
+                        <Stage width={600} height={350}>
+                          <Layer>
+                            {previousCard.value.map((line, i) => (
+                              <Line
+                                key={i}
+                                points={line.points}
+                                stroke="#0a0a0a"
+                                strokeWidth={3}
+                                tension={0.5}
+                                lineCap="round"
+                                globalCompositeOperation={'source-over'}
+                              />
+                            ))}
+                          </Layer>
+                        </Stage>
+                      </div>
                     }
                     <textarea
                       className="card"
@@ -219,7 +223,8 @@ const Game = () => {
           gameData.gameState.round % 2 === 0 &&
           !cardSubmitted &&
           <div>
-            <p>La phrase à dessiner est : </p>
+            <h3>Séquence de {previousSequence.playerName}</h3>
+            <p>Dessinez la phrase de {previousCard.submitterName} : </p>
             <p class="card">{previousCard.value}</p>
             <Drawing submit={card => handleSubmitDrawCard(card)} />
           </div>
@@ -309,7 +314,7 @@ const Game = () => {
                   if (seq.type === 'dessin') {
                     return (
                       <div key={'seq' + seq.submitterId}>
-                        <p>Dessin de {seq.submitterName}</p>
+                        <p className="bold">Dessin de {seq.submitterName}</p>
                         <div className="card">
                           <Stage width={600} height={350}>
                             <Layer>
@@ -334,7 +339,7 @@ const Game = () => {
                   // Texte
                   return (
                     <div key={'seq' + seq.submitterId}>
-                      <p>Phrase de {seq.submitterName}</p>
+                      <p className="bold">Phrase de {seq.submitterName}</p>
                       <p className="card">{seq.value}</p>
                     </div>
                   );
