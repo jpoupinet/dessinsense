@@ -1,4 +1,4 @@
-import React, { useState, useContext } from 'react';
+import React, { useState, useContext, useEffect } from 'react';
 import {
   BrowserRouter as Router,
   Switch,
@@ -15,6 +15,7 @@ import Drawing from './Drawing';
 import WebSocketProvider, { WebSocketContext } from './Websocket';
 import createStore from './store';
 import { updateGameData } from './actions';
+import { API_URL } from './config';
 
 import './App.css';
 
@@ -47,6 +48,7 @@ const Game = () => {
   const idGame = useSelector(state => state.idGame);
   const userToken = useSelector(state => state.userToken);
   const gameData = useSelector(state => state.gameData);
+  const [redirect, setRedirect] = useState('');
 
   const [gameInit, setGameInit] = useState(false);
   const [showPlayers, setShowPlayers] = useState(false);
@@ -55,14 +57,14 @@ const Game = () => {
   const dispatch = useDispatch();
   const ws = useContext(WebSocketContext);
 
+  if (!userToken || roomName === 'archives') {
+    return (<div>{!idGame && <Redirect to={'/' + roomName} />}</div>);
+  }
+
   if (roomName !== idGame && userToken) {
     dispatch(updateGameData(null));
     ws.wsConnectToRoom(roomName, userToken.id, userToken.name);
     return (<div></div>);
-  }
-
-  if (!userToken) {
-    return (<div>{!idGame && <Redirect to={'/' + roomName} />}</div>);
   }
 
   if (!gameInit) {
@@ -115,6 +117,7 @@ const Game = () => {
 
   return (
     <div id="game">
+      { redirect.trim().length > 0 && <Redirect to={redirect} /> }
       {
         showPlayers &&
         <PlayerList players={gameData.players} idPlayer={userToken.id} />
@@ -282,7 +285,9 @@ const Game = () => {
                   disabled={!curPlayer.master}
                 >
                   Faire une nouvelle partie
+                  (ne sauvegardera pas la partie actuelle dans les archives)
                 </button>
+                <button onClick={() => setRedirect('/')}>Retour à la page d'accueil</button>
               </div>
             }
           </div>
@@ -376,6 +381,126 @@ const Game = () => {
   );
 };
 
+const Archives = () => {
+  const [games, setGames] = useState(null);
+  const [gameData, setGameData] = useState(null);
+  const [currentSequence, setCurrentSequence] = useState(null);
+  const [redirect, setRedirect] = useState('');
+  const { gameName } = useParams();
+
+  useEffect(() => {
+    const fetchArchives = async () => {
+      const archives = await fetch(`${API_URL}/archives`)
+        .then(response => response.json())
+        .then(json => json.map(g => g.substring(0, g.length - 5)));
+
+      setGames(archives);
+    };
+
+    const fetchGame = async () => {
+      const game = await fetch(`${API_URL}/archives/${gameName}`)
+        .then(response => response.json());
+      
+      setGameData(game);
+    };
+
+    if (gameName && !gameData) {
+      fetchGame();
+    } else if (!games) {
+      fetchArchives();
+    }
+  });
+
+  return (
+    <div>
+      { redirect.trim().length > 0 && <Redirect to={redirect} /> }
+      <h1>Parties archivées</h1>
+      <div>
+        {
+          !gameName && games &&
+          games.map((g, i) =>
+            <button onClick={() => setRedirect(`/archives/game/${g}`)} key={`archive${i}`}>
+              {g}
+            </button>
+          )
+        }
+        {
+          gameName && gameData && !currentSequence &&
+            <div>
+              {
+                gameData.gameState.sequences.map(seq =>
+                  <button
+                    onClick={() => setCurrentSequence(
+                      gameData.gameState.sequences.find(s => s.playerId === seq.playerId
+                    ))}
+                    key={'sequence' + seq.playerId}
+                  >
+                    Séquence de {seq.playerName}
+                  </button>
+                )
+              }
+              <button onClick={() => setRedirect('/archives/list')}>
+                Retour aux parties archivées
+              </button>
+            </div>
+        }
+        {
+          gameName && gameData && currentSequence &&
+            <div>
+              {
+                currentSequence.sequence.map(seq => {
+                  // Dessin
+                  if (seq.type === 'dessin') {
+                    return (
+                      <div key={'seq' + seq.submitterId}>
+                        <p className="bold">Dessin de {seq.submitterName}</p>
+                        <div className="card">
+                          <Stage width={600} height={350}>
+                            <Layer>
+                              {seq.value.lines.map((line, i) => (
+                                <Line
+                                  key={`line${i}`}
+                                  points={line.points}
+                                  stroke="#0a0a0a"
+                                  strokeWidth={3}
+                                  tension={0.5}
+                                  lineCap="round"
+                                  globalCompositeOperation={'source-over'}
+                                />
+                              ))}
+                              {seq.value.circles.map((circle, i) => (
+                                <Circle
+                                  key={`circle${i}`}
+                                  x={circle.x}
+                                  y={circle.y}
+                                  fill="0a0a0a"
+                                  radius={2}
+                                />
+                              ))}
+                            </Layer>
+                          </Stage>
+                        </div>
+                      </div>
+                    );
+                  }
+    
+                  // Texte
+                  return (
+                    <div key={'seq' + seq.submitterId}>
+                      <p className="bold">Phrase de {seq.submitterName}</p>
+                      <p className="card">{seq.value}</p>
+                    </div>
+                  );
+                })
+              }
+              <button onClick={() => setCurrentSequence(null)}>Choisir une autre séquence</button>
+            </div>
+        }
+      </div>
+    </div>
+  );
+};
+
 const Accueil = () => {
   const [roomName, setRoomName] = useState(useParams().roomName || '');
   const userToken = useSelector(state => state.userToken);
@@ -398,14 +523,14 @@ const Accueil = () => {
     const idUser = userToken ? userToken.id : uuidv4();
 
     ws.wsConnectToRoom(roomName, idUser, userName);
-    setRedirect(roomName);
+    setRedirect('/game/' + roomName);
   };
 
   return (
     <div id="accueil">
       {
         redirect.trim().length > 0 &&
-        <Redirect to={'/game/' + redirect} />
+        <Redirect to={redirect} />
       }
       <form onSubmit={handleSubmit}>
         <h1>Dessin Sensé</h1>
@@ -423,6 +548,9 @@ const Accueil = () => {
         </div>
         <input type="submit" value="Créer / Rejoindre une partie" />
       </form>
+      <div>
+        <button onClick={() => setRedirect('/archives/list')}>Archives</button>
+      </div>
     </div>
   );
 };
@@ -444,6 +572,12 @@ const App = () => {
               </Route>
               <Route path="/game/:roomName">
                 <Game />
+              </Route>
+              <Route exact path="/archives/list">
+                <Archives />
+              </Route>
+              <Route path="/archives/game/:gameName">
+                <Archives />
               </Route>
             </Switch>
           </Router>

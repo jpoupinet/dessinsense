@@ -3,7 +3,9 @@ require('dotenv').config();
 const express = require('express');
 const app = express();
 const fs = require('fs-extra');
+const cors = require('cors');
 
+app.use(cors());
 // const server = require('http').Server(app);
 
 const https = require('https');
@@ -41,6 +43,20 @@ const writeGameData = (idGame, data) => {
     console.error(e);
   }
 };
+
+app.get('/archives', (req, res) => {
+  try {
+    const games = JSON.stringify(fs.readdirSync('games/'));
+    res.send(games);
+  } catch (e) {
+    console.error(e);
+    return null;
+  }
+});
+
+app.get('/archives/:gameName', (req, res) => {
+  res.send(JSON.stringify(getGameData(req.params.gameName)));
+});
 
 const checkPlayersOnline = players =>
   players && players.filter(p => !p.online).length === 0;
