@@ -9,7 +9,7 @@ import {
 import { Provider, useSelector, useDispatch } from 'react-redux';
 import { PersistGate } from 'redux-persist/integration/react';
 import { v4 as uuidv4 } from 'uuid';
-import { Stage, Layer, Line } from 'react-konva';
+import { Stage, Layer, Line, Circle } from 'react-konva';
 
 import Drawing from './Drawing';
 import WebSocketProvider, { WebSocketContext } from './Websocket';
@@ -191,15 +191,24 @@ const Game = () => {
                       <div className="card">
                         <Stage width={600} height={350}>
                           <Layer>
-                            {previousCard.value.map((line, i) => (
+                            {previousCard.value.lines.map((line, i) => (
                               <Line
-                                key={i}
+                                key={`line${i}`}
                                 points={line.points}
                                 stroke="#0a0a0a"
                                 strokeWidth={3}
                                 tension={0.5}
                                 lineCap="round"
                                 globalCompositeOperation={'source-over'}
+                              />
+                            ))}
+                            {previousCard.value.circles.map((circle, i) => (
+                              <Circle
+                                key={`circle${i}`}
+                                x={circle.x}
+                                y={circle.y}
+                                fill="0a0a0a"
+                                radius={2}
                               />
                             ))}
                           </Layer>
@@ -318,15 +327,24 @@ const Game = () => {
                         <div className="card">
                           <Stage width={600} height={350}>
                             <Layer>
-                              {seq.value.map((line, i) => (
+                              {seq.value.lines.map((line, i) => (
                                 <Line
-                                  key={i}
+                                  key={`line${i}`}
                                   points={line.points}
                                   stroke="#0a0a0a"
                                   strokeWidth={3}
                                   tension={0.5}
                                   lineCap="round"
                                   globalCompositeOperation={'source-over'}
+                                />
+                              ))}
+                              {seq.value.circles.map((circle, i) => (
+                                <Circle
+                                  key={`circle${i}`}
+                                  x={circle.x}
+                                  y={circle.y}
+                                  fill="0a0a0a"
+                                  radius={2}
                                 />
                               ))}
                             </Layer>
