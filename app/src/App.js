@@ -410,7 +410,7 @@ const Archives = () => {
       fetchArchives();
     }
   });
-  console.log(currentSequence);
+  
   return (
     <div>
       { redirect.trim().length > 0 && <Redirect to={redirect} /> }
