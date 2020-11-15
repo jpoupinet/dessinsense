@@ -44,6 +44,7 @@ const Drawing = props => {
         onTouchStart={handleMouseDown}
         onTouchMove={handleMouseMove}
         onTouchEnd={handleMouseUp}
+        touchAction="none"
         style={{ touchAction: 'none' }}
       >
         <Layer>
