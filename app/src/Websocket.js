@@ -12,6 +12,9 @@ export default function Websocket({ children }) {
   let socket;
   let ws;
 
+  const idGame = useSelector(state => state.idGame);
+  const userToken = useSelector(state => state.userToken);
+
   const dispatch = useDispatch();
 
   const wsConnectToRoom = (idGame, idUser, nameUser) => {
@@ -55,9 +58,6 @@ export default function Websocket({ children }) {
     });
 
     socket.on('reconnect', () => {
-      const idGame = useSelector(state => state.idGame);
-      const userToken = useSelector(state => state.userToken);
-
       if (!idGame || !userToken) return;
 
       wsConnectToRoom(idGame, userToken.id, userToken.name);

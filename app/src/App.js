@@ -57,8 +57,8 @@ const Game = () => {
   const dispatch = useDispatch();
   const ws = useContext(WebSocketContext);
 
-  if (!userToken || roomName === 'archives') {
-    return (<div>{!idGame && <Redirect to={'/' + roomName} />}</div>);
+  if (!userToken || !idGame || roomName === 'archives') {
+    return (<div>{<Redirect to={'/' + roomName} />}</div>);
   }
 
   if (roomName !== idGame && userToken) {
