@@ -185,6 +185,9 @@ io.on('connection', socket => {
 
     if (indexSequence === -1) return;
 
+    if (gameData.gameState.sequences[indexSequence].sequence
+      .findIndex(s => s.submitterId === socket.playerId)) return;
+
     gameData.gameState.sequences[indexSequence].sequence.push({
       submitterId: socket.playerId,
       submitterName: socket.playerName,
