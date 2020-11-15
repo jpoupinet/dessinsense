@@ -56,11 +56,7 @@ export default function Websocket({ children }) {
     socket.on('gameStateChange', gameData => {
       dispatch(updateGameData(gameData));
     });
-
-    socket.on('reconnect', () => {
-      if (idGame && userToken) wsConnectToRoom(idGame, userToken.id, userToken.name);
-    });
-
+    
     ws = {
       socket,
       wsConnectToRoom,
