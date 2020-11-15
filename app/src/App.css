@@ -101,6 +101,7 @@ button, input[type=submit] {
   resize: none;
   text-align: center;
   font-size: 40px;
+  touch-action: none;
 }
 
 #submitDessin {
