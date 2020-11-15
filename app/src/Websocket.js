@@ -1,7 +1,7 @@
 import React, { createContext } from 'react';
 import io from 'socket.io-client';
 import { API_URL } from './config';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import { connectToRoom, updateGameData, roomAlreadyExists } from './actions';
 
 const WebSocketContext = createContext(null);
@@ -11,9 +11,6 @@ export { WebSocketContext };
 export default function Websocket({ children }) {
   let socket;
   let ws;
-
-  const idGame = useSelector(state => state.idGame);
-  const userToken = useSelector(state => state.userToken);
 
   const dispatch = useDispatch();
 
@@ -56,7 +53,7 @@ export default function Websocket({ children }) {
     socket.on('gameStateChange', gameData => {
       dispatch(updateGameData(gameData));
     });
-    
+
     ws = {
       socket,
       wsConnectToRoom,
