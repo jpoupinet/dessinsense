@@ -58,9 +58,7 @@ export default function Websocket({ children }) {
     });
 
     socket.on('reconnect', () => {
-      if (!idGame || !userToken) return;
-
-      wsConnectToRoom(idGame, userToken.id, userToken.name);
+      if (idGame && userToken) wsConnectToRoom(idGame, userToken.id, userToken.name);
     });
 
     ws = {
