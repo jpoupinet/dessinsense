@@ -245,13 +245,21 @@ const Game = () => {
               )
             }
             {
-              <div>
+              <div id="boutonsFinPartie">
                 <button
                   onClick={() => ws.wsStartGame()}
                   disabled={!curPlayer.master}
                 >
                   Faire une nouvelle partie
-                  (ne sauvegardera pas la partie actuelle dans les archives)
+                </button>
+                <button
+                  onClick={() => {
+                    ws.wsArchiveCurrentGame();
+                    alert('Partie archivée');
+                  }}
+                  disabled={!curPlayer.master}
+                >
+                  Archiver la partie
                 </button>
                 <button onClick={() => setRedirect('/')}>Retour à la page d'accueil</button>
               </div>

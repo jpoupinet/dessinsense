@@ -41,27 +41,36 @@ const Archives = () => {
       <div>
         {
           !gameName && games &&
+            games.map((g, i) =>
+              <button
+                onClick={() => {
+                  setGameData(null);
+                  setRedirect(`/archives/game/${g}`);
+                }}
+                key={`archive${i}`}
+              >
+                {`
+                  ${g.substr(0, g.lastIndexOf('-'))} - 
+                  ${new Date(parseInt(g.substr(g.lastIndexOf('-') + 1)))
+                    .toLocaleString('fr-FR')}
+                `}
+              </button>
+            )
+        }
+        {
+          !gameName && !games &&
           <div>
-            {
-              games.map((g, i) =>
-                <button
-                  onClick={() => {
-                    setGameData(null);
-                    setRedirect(`/archives/game/${g}`);
-                  }}
-                  key={`archive${i}`}
-                >
-                  {g}
-                </button>
-              )
-            }
-            <br/>
             <button onClick={() => setRedirect('/')}>Retourner à l'accueil</button>
           </div>
         }
         {
           gameName && gameData && !currentSequence &&
             <div>
+              <h3>{`
+                ${gameName.substr(0, gameName.lastIndexOf('-'))} - 
+                ${new Date(parseInt(gameName.substr(gameName.lastIndexOf('-') + 1)))
+                  .toLocaleString('fr-FR')}
+              `}</h3>
               {
                 gameData.gameState.sequences.map(seq =>
                   <button

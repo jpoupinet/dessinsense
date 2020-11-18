@@ -23,22 +23,20 @@ app.get('/', (req, res) => res.send('Dessin Sensé API'));
 
 const mod = (n, m) => ((n % m) + m) % m;
 
-const getGameData = idGame => {
+const getGameData = (idGame, archive = false) => {
   try {
-    return JSON.parse(fs.readFileSync('games/' + idGame + '.json', 'utf-8'));
+    const path = archive ? `archives/${idGame}.json` : `games/${idGame}.json`;
+    return JSON.parse(fs.readFileSync(path, 'utf-8'));
   } catch (e) {
     console.error(e);
     return null;
   }
 };
 
-const writeGameData = (idGame, data) => {
+const writeGameData = (idGame, data, archive = false) => {
   try {
-    fs.outputFileSync(
-      'games/' + idGame + '.json',
-      JSON.stringify(data),
-      'utf-8'
-    );
+    const path = archive ? `archives/${idGame}-${Date.now()}.json` : `games/${idGame}.json`;
+    fs.outputFileSync(path, JSON.stringify(data), 'utf-8');
   } catch (e) {
     console.error(e);
   }
@@ -46,7 +44,7 @@ const writeGameData = (idGame, data) => {
 
 app.get('/archives', (req, res) => {
   try {
-    const games = JSON.stringify(fs.readdirSync('games/'));
+    const games = JSON.stringify(fs.readdirSync('archives/'));
     res.send(games);
   } catch (e) {
     console.error(e);
@@ -55,7 +53,7 @@ app.get('/archives', (req, res) => {
 });
 
 app.get('/archives/:gameName', (req, res) => {
-  res.send(JSON.stringify(getGameData(req.params.gameName)));
+  res.send(JSON.stringify(getGameData(req.params.gameName, true)));
 });
 
 const checkPlayersOnline = players =>
@@ -234,6 +232,14 @@ io.on('connection', socket => {
 
     writeGameData(socket.idGame, gameData);
     io.sockets.in(socket.idGame).emit('gameStateChange', gameData);
+  });
+
+  socket.on('archiveCurrentGame', () => {
+    if (!socket.idGame) return;
+    const gameData = getGameData(socket.idGame);
+    if (!gameData.players.find(p => p.id === socket.playerId).master) return;
+
+    writeGameData(socket.idGame, gameData, true);
   });
 
   socket.on('disconnect', () => {

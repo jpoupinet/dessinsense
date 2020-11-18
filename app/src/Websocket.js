@@ -43,6 +43,10 @@ export default function Websocket({ children }) {
     socket.emit('setCurrentSequence', payload);
   };
 
+  const wsArchiveCurrentGame = () => {
+    socket.emit('archiveCurrentGame');
+  };
+
   if (!socket) {
     socket = io.connect(API_URL);
 
@@ -59,7 +63,8 @@ export default function Websocket({ children }) {
       wsConnectToRoom,
       wsStartGame,
       wsSubmitCard,
-      wsSetCurrentSequence
+      wsSetCurrentSequence,
+      wsArchiveCurrentGame
     };
   }
 
