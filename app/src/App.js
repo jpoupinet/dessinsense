@@ -419,7 +419,13 @@ const Archives = () => {
         {
           !gameName && games &&
           games.map((g, i) =>
-            <button onClick={() => setRedirect(`/archives/game/${g}`)} key={`archive${i}`}>
+            <button
+              onClick={() => {
+                setGameData(null);
+                setRedirect(`/archives/game/${g}`);
+              }}
+              key={`archive${i}`}
+            >
               {g}
             </button>
           )
