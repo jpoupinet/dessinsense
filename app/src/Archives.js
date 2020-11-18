@@ -58,7 +58,7 @@ const Archives = () => {
             )
         }
         {
-          !gameName && !games &&
+          !gameName &&
           <div>
             <button onClick={() => setRedirect('/')}>Retourner à l'accueil</button>
           </div>
