@@ -8,6 +8,7 @@ import PlayerList from './PlayerList';
 import mod from './modulo';
 import { WebSocketContext } from './Websocket';
 import { updateGameData } from './actions';
+import playersIcon from './assets/players.png';
 
 const Game = () => {
   const roomName = useParams().roomName;
@@ -92,7 +93,7 @@ const Game = () => {
           id="showPlayers"
           onClick={() => setShowPlayers(!showPlayers)}
         >
-        {showPlayers ? '◄' : '►'}
+        <img src={playersIcon} alt="Liste des joueurs" />
       </button>
       <div id="gameZone">
         {
