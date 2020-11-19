@@ -85,10 +85,7 @@ const Game = () => {
   return (
     <div id="game">
       { redirect.trim().length > 0 && <Redirect to={redirect} /> }
-      {
-        showPlayers &&
-        <PlayerList players={gameData.players} idPlayer={userToken.id} />
-      }
+      <PlayerList players={gameData.players} idPlayer={userToken.id} showPlayers={showPlayers} />
       <button
           id="showPlayers"
           onClick={() => setShowPlayers(!showPlayers)}

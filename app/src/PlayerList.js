@@ -1,6 +1,6 @@
-const PlayerList = ({ players, idPlayer }) => {
+const PlayerList = ({ players, idPlayer, showPlayers }) => {
   return (
-    <div id="players">
+    <div id="players" style={{ visibility: showPlayers ? 'visible' : 'hidden' }}>
       <p id="header">Liste des joueurs</p>
       {players.map(player => {
         if (player.id === idPlayer) {
