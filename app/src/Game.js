@@ -179,7 +179,9 @@ const Game = () => {
           <div>
             <h3>Séquence de {previousSequence.playerName}</h3>
             <p>Dessinez la phrase de {previousCard.submitterName} : </p>
-            <p className="card">{previousCard.value}</p>
+            <div className="card">
+              <p>{previousCard.value}</p>
+            </div>
             <Drawing submit={card => handleSubmitDrawCard(card)} />
           </div>
         }
