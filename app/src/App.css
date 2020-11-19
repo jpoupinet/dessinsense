@@ -27,6 +27,7 @@ html, body {
 
 button, input[type=submit] {
   margin: 5px;
+  max-width: 700px;
   padding: 10px 20px 10px 20px;
 }
 
@@ -62,8 +63,15 @@ button, input[type=submit] {
 }
 
 #gameZone {
+  display: flex;
+  flex-direction: column;
   flex: 5;
   padding: 20px;
+}
+
+#gameZone div, #gameZone div form, #gameZone div form label,  #gameZone div div {
+  display: flex;
+  flex-direction: column;
 }
 
 #gameZone input[type=text] {
@@ -92,15 +100,26 @@ button, input[type=submit] {
 }
 
 .card {
-  display: block;
+  display: flex;
   border: 1px solid #333;
-  width: 600px;
-  height: 350px;
+  max-width: 700px;
+  max-height: 400px;
   margin: 20px 0 20px 0;
   padding: 5px;
   resize: none;
   text-align: center;
   font-size: 40px;
+}
+
+.card textarea {
+  flex: 1;
+  resize: none;
+  text-align: center;
+  font-size: 40px;
+}
+
+.card p {
+  word-wrap: break-word;
 }
 
 #submitDessin {
@@ -109,4 +128,8 @@ button, input[type=submit] {
 
 #boutonsFinPartie {
   margin-top: 20px;
+}
+
+#boutonsSequences {
+  flex-direction: row !important;
 }

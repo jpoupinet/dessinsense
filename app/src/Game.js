@@ -159,37 +159,15 @@ const Game = () => {
                     {
                       gameData.gameState.round > 1 &&
                       <div className="card">
-                        <Stage width={600} height={350}>
-                          <Layer>
-                            {previousCard.value.lines.map((line, i) => (
-                              <Line
-                                key={`line${i}`}
-                                points={line.points}
-                                stroke="#0a0a0a"
-                                strokeWidth={3}
-                                tension={0.5}
-                                lineCap="round"
-                                globalCompositeOperation={'source-over'}
-                              />
-                            ))}
-                            {previousCard.value.circles.map((circle, i) => (
-                              <Circle
-                                key={`circle${i}`}
-                                x={circle.x}
-                                y={circle.y}
-                                fill="0a0a0a"
-                                radius={2}
-                              />
-                            ))}
-                          </Layer>
-                        </Stage>
+                        <img src={previousCard.value} alt="Dessin à deviner" />
                       </div>
                     }
-                    <textarea
-                      className="card"
-                      value={card}
-                      onChange={handleTextCard}
-                    />
+                    <div className="card">
+                      <textarea
+                        value={card}
+                        onChange={handleTextCard}
+                      />
+                    </div>
                   </label>
                 </div>
                 <input type="submit" value="Valider" />
@@ -234,17 +212,19 @@ const Game = () => {
               ({gameData.players.find(p => p.master).name}) 
               va choisir une séquence à afficher.
             </h3>
-            {
-              gameData.gameState.sequences.map(s =>
-                <button
-                  onClick={() => ws.wsSetCurrentSequence(s.playerId, 1)}
-                  key={'sequence' + s.playerId}
-                  disabled={!curPlayer.master}
-                >
-                  Séquence de {s.playerName}
-                </button>
-              )
-            }
+            <div id="boutonsSequences">
+              {
+                gameData.gameState.sequences.map(s =>
+                  <button
+                    onClick={() => ws.wsSetCurrentSequence(s.playerId, 1)}
+                    key={'sequence' + s.playerId}
+                    disabled={!curPlayer.master}
+                  >
+                    Séquence de {s.playerName}
+                  </button>
+                )
+              }
+            </div>
             {
               <div id="boutonsFinPartie">
                 <button
@@ -305,30 +285,7 @@ const Game = () => {
                       <div key={'seq' + seq.submitterId}>
                         <p className="bold">Dessin de {seq.submitterName}</p>
                         <div className="card">
-                          <Stage width={600} height={350}>
-                            <Layer>
-                              {seq.value.lines.map((line, i) => (
-                                <Line
-                                  key={`line${i}`}
-                                  points={line.points}
-                                  stroke="#0a0a0a"
-                                  strokeWidth={3}
-                                  tension={0.5}
-                                  lineCap="round"
-                                  globalCompositeOperation={'source-over'}
-                                />
-                              ))}
-                              {seq.value.circles.map((circle, i) => (
-                                <Circle
-                                  key={`circle${i}`}
-                                  x={circle.x}
-                                  y={circle.y}
-                                  fill="0a0a0a"
-                                  radius={2}
-                                />
-                              ))}
-                            </Layer>
-                          </Stage>
+                          <img src={seq.value} alt="Dessin séquence" />
                         </div>
                       </div>
                     );
@@ -338,16 +295,18 @@ const Game = () => {
                   return (
                     <div key={'seq' + seq.submitterId}>
                       <p className="bold">Phrase de {seq.submitterName}</p>
-                      <p className="card">{seq.value}</p>
+                      <div className="card">
+                        <p>{seq.value}</p>
+                      </div>
                     </div>
                   );
                 })
             }
             <div>
               <h3>Phrase de départ :</h3>
-              <p className="card">
-                {gameData.gameState.currentSequence.sequence.sequence[0].value}
-              </p>
+              <div className="card">
+                <p>{gameData.gameState.currentSequence.sequence.sequence[0].value}</p>
+              </div>
             </div>
           </div>
         }
