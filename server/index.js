@@ -6,15 +6,15 @@ const fs = require('fs-extra');
 const cors = require('cors');
 
 app.use(cors());
-const server = require('http').Server(app);
+// const server = require('http').Server(app);
 
-// const https = require('https');
-// const options = {
-//   key: fs.readFileSync('/etc/letsencrypt/live/jpoupinet.com/privkey.pem', 'utf8'),
-//   cert: fs.readFileSync('/etc/letsencrypt/live/jpoupinet.com/cert.pem', 'utf8'),
-//   ca: fs.readFileSync('/etc/letsencrypt/live/jpoupinet.com/chain.pem', 'utf8')
-// };
-// const server = https.Server(options, app);
+const https = require('https');
+const options = {
+  key: fs.readFileSync('/etc/letsencrypt/live/jpoupinet.com/privkey.pem', 'utf8'),
+  cert: fs.readFileSync('/etc/letsencrypt/live/jpoupinet.com/cert.pem', 'utf8'),
+  ca: fs.readFileSync('/etc/letsencrypt/live/jpoupinet.com/chain.pem', 'utf8')
+};
+const server = https.Server(options, app);
 
 const io = require('socket.io')(server);
 server.listen(process.env.PORT);
