@@ -85,13 +85,13 @@ const Game = () => {
   return (
     <div id="game">
       { redirect.trim().length > 0 && <Redirect to={redirect} /> }
-      <PlayerList players={gameData.players} idPlayer={userToken.id} showPlayers={showPlayers} />
+      {/* <PlayerList players={gameData.players} idPlayer={userToken.id} showPlayers={showPlayers} />
       <button
           id="showPlayers"
           onClick={() => setShowPlayers(!showPlayers)}
         >
         <img src={playersIcon} alt="Liste des joueurs" />
-      </button>
+      </button> */}
       <div id="gameZone">
         {
           // Lobby
