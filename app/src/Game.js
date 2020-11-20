@@ -1,7 +1,6 @@
 import React, { useState, useContext } from 'react';
 import { useParams, Redirect } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
-import { Stage, Layer, Line, Circle } from 'react-konva';
 
 import Drawing from './Drawing';
 import PlayerList from './PlayerList';
@@ -85,10 +84,7 @@ const Game = () => {
   return (
     <div id="game">
       { redirect.trim().length > 0 && <Redirect to={redirect} /> }
-      {
-        showPlayers &&
-        <PlayerList players={gameData.players} idPlayer={userToken.id} />
-      }
+      <PlayerList players={gameData.players} idPlayer={userToken.id} showPlayers={showPlayers} />
       <button
           id="showPlayers"
           onClick={() => setShowPlayers(!showPlayers)}
@@ -143,12 +139,12 @@ const Game = () => {
           gameData.gameState.started &&
           gameData.gameState.round % 2 !== 0 &&
           !cardSubmitted &&
-            <div>
-              <form onSubmit={handleSubmitTextCard}>
-                <div>
+            <div style={{ height: '100%' }}>
+              <form id="formTexte" onSubmit={handleSubmitTextCard}>
+                <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
                   { gameData.gameState.round > 1 && 
                     <h3>Séquence de {previousSequence.playerName}</h3> }
-                  <label>
+                  <p>
                     {
                       gameData.gameState.round === 1 ?
                         'Entrez une phrase qu\'un autre joueur devra dessiner : '
@@ -156,43 +152,21 @@ const Game = () => {
                         `Ecrivez ce que vous voyez sur ce dessin de 
                           ${previousCard.submitterName} : `
                     }
-                    {
-                      gameData.gameState.round > 1 &&
-                      <div className="card">
-                        <Stage width={600} height={350}>
-                          <Layer>
-                            {previousCard.value.lines.map((line, i) => (
-                              <Line
-                                key={`line${i}`}
-                                points={line.points}
-                                stroke="#0a0a0a"
-                                strokeWidth={3}
-                                tension={0.5}
-                                lineCap="round"
-                                globalCompositeOperation={'source-over'}
-                              />
-                            ))}
-                            {previousCard.value.circles.map((circle, i) => (
-                              <Circle
-                                key={`circle${i}`}
-                                x={circle.x}
-                                y={circle.y}
-                                fill="0a0a0a"
-                                radius={2}
-                              />
-                            ))}
-                          </Layer>
-                        </Stage>
-                      </div>
-                    }
+                  </p>
+                  {
+                    gameData.gameState.round > 1 &&
+                    <div className="card">
+                      <img src={previousCard.value} alt="Dessin à deviner" />
+                    </div>
+                  }
+                  <div className="card">
                     <textarea
-                      className="card"
                       value={card}
                       onChange={handleTextCard}
                     />
-                  </label>
+                  </div>
                 </div>
-                <input type="submit" value="Valider" />
+                <input className="btnValider" type="submit" value="Envoyer" />
               </form>
             </div>
         }
@@ -201,10 +175,12 @@ const Game = () => {
           gameData.gameState.started &&
           gameData.gameState.round % 2 === 0 &&
           !cardSubmitted &&
-          <div>
+          <div style={{ height: '100%' }}>
             <h3>Séquence de {previousSequence.playerName}</h3>
             <p>Dessinez la phrase de {previousCard.submitterName} : </p>
-            <p className="card">{previousCard.value}</p>
+            <div className="card">
+              <p>{previousCard.value}</p>
+            </div>
             <Drawing submit={card => handleSubmitDrawCard(card)} />
           </div>
         }
@@ -234,17 +210,19 @@ const Game = () => {
               ({gameData.players.find(p => p.master).name}) 
               va choisir une séquence à afficher.
             </h3>
-            {
-              gameData.gameState.sequences.map(s =>
-                <button
-                  onClick={() => ws.wsSetCurrentSequence(s.playerId, 1)}
-                  key={'sequence' + s.playerId}
-                  disabled={!curPlayer.master}
-                >
-                  Séquence de {s.playerName}
-                </button>
-              )
-            }
+            <div id="boutonsSequences">
+              {
+                gameData.gameState.sequences.map(s =>
+                  <button
+                    onClick={() => ws.wsSetCurrentSequence(s.playerId, 1)}
+                    key={'sequence' + s.playerId}
+                    disabled={!curPlayer.master}
+                  >
+                    Séquence de {s.playerName}
+                  </button>
+                )
+              }
+            </div>
             {
               <div id="boutonsFinPartie">
                 <button
@@ -274,26 +252,28 @@ const Game = () => {
           gameData.gameState.currentSequence &&
           <div>
             <h2>Séquence de {gameData.gameState.currentSequence.sequence.playerName}</h2>
-            <button
-              style={{
-                display: gameData.gameState.currentSequence.nbCardsToShow >= 
-                  gameData.gameState.currentSequence.sequence.sequence.length ?
-                  'none' : 'inline'
-              }}
-              onClick={() => ws.wsSetCurrentSequence(
-                gameData.gameState.currentSequence.sequence.playerId,
-                gameData.gameState.currentSequence.nbCardsToShow + 1
-              )}
-              disabled={!curPlayer.master}
-            >
-              Suite
-            </button>
-            <button
-              onClick={() => ws.wsSetCurrentSequence()}
-              disabled={!curPlayer.master}
-            >
-              Choisir une autre séquence
-            </button>
+            <div className="boutonsSequences">
+              <button
+                style={{
+                  display: gameData.gameState.currentSequence.nbCardsToShow >= 
+                    gameData.gameState.currentSequence.sequence.sequence.length ?
+                    'none' : 'inline'
+                }}
+                onClick={() => ws.wsSetCurrentSequence(
+                  gameData.gameState.currentSequence.sequence.playerId,
+                  gameData.gameState.currentSequence.nbCardsToShow + 1
+                )}
+                disabled={!curPlayer.master}
+              >
+                Suite
+              </button>
+              <button
+                onClick={() => ws.wsSetCurrentSequence()}
+                disabled={!curPlayer.master}
+              >
+                Choisir une autre séquence
+              </button>
+            </div>
             {
               gameData.gameState.currentSequence.sequence.sequence
                 .slice(1, gameData.gameState.currentSequence.nbCardsToShow)
@@ -305,30 +285,7 @@ const Game = () => {
                       <div key={'seq' + seq.submitterId}>
                         <p className="bold">Dessin de {seq.submitterName}</p>
                         <div className="card">
-                          <Stage width={600} height={350}>
-                            <Layer>
-                              {seq.value.lines.map((line, i) => (
-                                <Line
-                                  key={`line${i}`}
-                                  points={line.points}
-                                  stroke="#0a0a0a"
-                                  strokeWidth={3}
-                                  tension={0.5}
-                                  lineCap="round"
-                                  globalCompositeOperation={'source-over'}
-                                />
-                              ))}
-                              {seq.value.circles.map((circle, i) => (
-                                <Circle
-                                  key={`circle${i}`}
-                                  x={circle.x}
-                                  y={circle.y}
-                                  fill="0a0a0a"
-                                  radius={2}
-                                />
-                              ))}
-                            </Layer>
-                          </Stage>
+                          <img src={seq.value} alt="Dessin séquence" />
                         </div>
                       </div>
                     );
@@ -338,16 +295,18 @@ const Game = () => {
                   return (
                     <div key={'seq' + seq.submitterId}>
                       <p className="bold">Phrase de {seq.submitterName}</p>
-                      <p className="card">{seq.value}</p>
+                      <div className="card">
+                        <p>{seq.value}</p>
+                      </div>
                     </div>
                   );
                 })
             }
             <div>
               <h3>Phrase de départ :</h3>
-              <p className="card">
-                {gameData.gameState.currentSequence.sequence.sequence[0].value}
-              </p>
+              <div className="card">
+                <p>{gameData.gameState.currentSequence.sequence.sequence[0].value}</p>
+              </div>
             </div>
           </div>
         }

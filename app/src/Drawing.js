@@ -1,11 +1,15 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Stage, Layer, Line, Circle } from 'react-konva';
 
 const Drawing = props => {
   const [tool, setTool] = useState('pen');
   const [lines, setLines] = useState([]);
   const [circles, setCircles] = useState([]);
+  const [stageWidth, setStageWidth] = useState(0);
+  const [stageHeight, setStageHeight] = useState(0);
   const isDrawing = useRef(false);
+  const stageRef = useRef(null);
+  const stageContainerRef = useRef(null);
   
   const handleMouseDown = e => {
     isDrawing.current = true;
@@ -31,46 +35,60 @@ const Drawing = props => {
   const handleMouseUp = () => {
     isDrawing.current = false;
   };
-  
+
+  const handleSubmit = () => {
+    props.submit(stageRef.current.toDataURL());
+  };
+
+  useEffect(() => {
+    setStageWidth(stageContainerRef.current.clientWidth);
+    setStageHeight(
+      stageContainerRef.current.clientHeight - (stageContainerRef.current.clientHeight / 10)
+    );
+  }, []);
+
   return (
-    <div className="card">
-      <Stage
-        width={600}
-        height={350}
-        onMouseDown={handleMouseDown}
-        onMousemove={handleMouseMove}
-        onMouseup={handleMouseUp}
-        onMouseLeave={handleMouseUp}
-        onTouchStart={handleMouseDown}
-        onTouchMove={handleMouseMove}
-        onTouchEnd={handleMouseUp}
-        touchAction="none"
-        style={{ touchAction: 'none' }}
-      >
-        <Layer>
-          {lines.map((line, i) => (
-            <Line
-              key={`line${i}`}
-              points={line.points}
-              stroke="#0a0a0a"
-              strokeWidth={3}
-              tension={0.5}
-              lineCap="round"
-              globalCompositeOperation={'source-over'}
-            />
-          ))}
-          {circles.map((circle, i) => (
-            <Circle
-              key={`circle${i}`}
-              x={circle.x}
-              y={circle.y}
-              fill="0a0a0a"
-              radius={2}
-            />
-          ))}
-        </Layer>
-      </Stage>
-      <button id="submitDessin" onClick={() => props.submit({lines, circles})}>Envoyer</button>
+    <div style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
+      <div ref={stageContainerRef} className="card" style={{ height: '100%', flex: 1 }}>
+        <Stage
+          width={stageWidth}
+          height={stageHeight}
+          onMouseDown={handleMouseDown}
+          onMousemove={handleMouseMove}
+          onMouseup={handleMouseUp}
+          onMouseLeave={handleMouseUp}
+          onTouchStart={handleMouseDown}
+          onTouchMove={handleMouseMove}
+          onTouchEnd={handleMouseUp}
+          touchAction="none"
+          style={{ touchAction: 'none' }}
+          ref={stageRef}
+        >
+          <Layer>
+            {lines.map((line, i) => (
+              <Line
+                key={`line${i}`}
+                points={line.points}
+                stroke="#0a0a0a"
+                strokeWidth={3}
+                tension={0.5}
+                lineCap="round"
+                globalCompositeOperation={'source-over'}
+              />
+            ))}
+            {circles.map((circle, i) => (
+              <Circle
+                key={`circle${i}`}
+                x={circle.x}
+                y={circle.y}
+                fill="0a0a0a"
+                radius={2}
+              />
+            ))}
+          </Layer>
+        </Stage>
+      </div>
+      <button id="submitDessin" className="btnValider" onClick={handleSubmit}>Envoyer</button>
     </div>
   );
 }

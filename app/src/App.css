@@ -1,3 +1,10 @@
+* , *:before, *:after { 
+  box-sizing:border-box; 
+  -moz-box-sizing:border-box; 
+  -webkit-box-sizing:border-box; 
+  -ms-box-sizing:border-box;
+}
+
 html, body {
   height: 100%;
 }
@@ -26,7 +33,7 @@ html, body {
 }
 
 button, input[type=submit] {
-  margin: 5px;
+  max-width: 700px;
   padding: 10px 20px 10px 20px;
 }
 
@@ -46,7 +53,6 @@ button, input[type=submit] {
 }
 
 #players {
-  flex: 1;
   height: 100%;
   padding: 10px;
   border-right: 1px solid #ccc;
@@ -62,8 +68,10 @@ button, input[type=submit] {
 }
 
 #gameZone {
-  flex: 5;
+  flex: 1;
+  flex-direction: column;
   padding: 20px;
+  height: 100%;
 }
 
 #gameZone input[type=text] {
@@ -76,7 +84,13 @@ button, input[type=submit] {
 }
 
 #lienPartie {
-  width: 300px;
+  width: 100%;
+  max-width: 500px;
+}
+
+#archives {
+  padding: 20px;
+  height: 100%;
 }
 
 .player {
@@ -92,13 +106,35 @@ button, input[type=submit] {
 }
 
 .card {
-  display: block;
+  flex: 1;
   border: 1px solid #333;
-  width: 600px;
-  height: 350px;
   margin: 20px 0 20px 0;
-  padding: 5px;
+  width: 100%;
+  max-width: 700px;
+  max-height: 400px;
+  overflow: auto;
+}
+
+.card textarea {
+  width: 100%;
+  height: 100%;
+  max-width: 700px;
+  max-height: 390px;
+  box-sizing: border-box;
   resize: none;
+  text-align: center;
+  font-size: 40px;
+  border: none;
+}
+
+.card img {
+  max-height: 100%;
+  max-width: 100%;
+  max-height: 390px;
+}
+
+.card p {
+  word-break: break-all;
   text-align: center;
   font-size: 40px;
 }
@@ -108,5 +144,29 @@ button, input[type=submit] {
 }
 
 #boutonsFinPartie {
+  display: flex;
+  flex-direction: column;
   margin-top: 20px;
+}
+
+.boutonsSequences button, #boutonsFinPartie button {
+  margin-top: 5px;
+  margin-right: 5px;
+}
+
+.boutonsSequences {
+  display: flex;
+  flex-wrap: wrap;
+  flex-direction: row;
+  max-width: 700px;
+}
+
+#formTexte {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.btnValider {
+  background-color: rgb(140, 236, 140);
 }
