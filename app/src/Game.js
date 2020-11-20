@@ -210,7 +210,7 @@ const Game = () => {
               ({gameData.players.find(p => p.master).name}) 
               va choisir une séquence à afficher.
             </h3>
-            <div id="boutonsSequences">
+            <div className="boutonsSequences">
               {
                 gameData.gameState.sequences.map(s =>
                   <button
