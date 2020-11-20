@@ -140,12 +140,12 @@ const Game = () => {
           gameData.gameState.started &&
           gameData.gameState.round % 2 !== 0 &&
           !cardSubmitted &&
-            <div>
-              <form onSubmit={handleSubmitTextCard}>
-                <div>
+            <div style={{ height: '100%' }}>
+              <form id="formTexte" onSubmit={handleSubmitTextCard}>
+                <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
                   { gameData.gameState.round > 1 && 
                     <h3>Séquence de {previousSequence.playerName}</h3> }
-                  <label>
+                  <p>
                     {
                       gameData.gameState.round === 1 ?
                         'Entrez une phrase qu\'un autre joueur devra dessiner : '
@@ -153,21 +153,21 @@ const Game = () => {
                         `Ecrivez ce que vous voyez sur ce dessin de 
                           ${previousCard.submitterName} : `
                     }
-                    {
-                      gameData.gameState.round > 1 &&
-                      <div className="card">
-                        <img src={previousCard.value} alt="Dessin à deviner" />
-                      </div>
-                    }
+                  </p>
+                  {
+                    gameData.gameState.round > 1 &&
                     <div className="card">
-                      <textarea
-                        value={card}
-                        onChange={handleTextCard}
-                      />
+                      <img src={previousCard.value} alt="Dessin à deviner" />
                     </div>
-                  </label>
+                  }
+                  <div className="card">
+                    <textarea
+                      value={card}
+                      onChange={handleTextCard}
+                    />
+                  </div>
                 </div>
-                <input type="submit" value="Valider" />
+                <input className="btnValider" type="submit" value="Envoyer" />
               </form>
             </div>
         }
@@ -176,7 +176,7 @@ const Game = () => {
           gameData.gameState.started &&
           gameData.gameState.round % 2 === 0 &&
           !cardSubmitted &&
-          <div>
+          <div style={{ height: '100%' }}>
             <h3>Séquence de {previousSequence.playerName}</h3>
             <p>Dessinez la phrase de {previousCard.submitterName} : </p>
             <div className="card">
@@ -253,26 +253,28 @@ const Game = () => {
           gameData.gameState.currentSequence &&
           <div>
             <h2>Séquence de {gameData.gameState.currentSequence.sequence.playerName}</h2>
-            <button
-              style={{
-                display: gameData.gameState.currentSequence.nbCardsToShow >= 
-                  gameData.gameState.currentSequence.sequence.sequence.length ?
-                  'none' : 'inline'
-              }}
-              onClick={() => ws.wsSetCurrentSequence(
-                gameData.gameState.currentSequence.sequence.playerId,
-                gameData.gameState.currentSequence.nbCardsToShow + 1
-              )}
-              disabled={!curPlayer.master}
-            >
-              Suite
-            </button>
-            <button
-              onClick={() => ws.wsSetCurrentSequence()}
-              disabled={!curPlayer.master}
-            >
-              Choisir une autre séquence
-            </button>
+            <div id="boutonsSequences">
+              <button
+                style={{
+                  display: gameData.gameState.currentSequence.nbCardsToShow >= 
+                    gameData.gameState.currentSequence.sequence.sequence.length ?
+                    'none' : 'inline'
+                }}
+                onClick={() => ws.wsSetCurrentSequence(
+                  gameData.gameState.currentSequence.sequence.playerId,
+                  gameData.gameState.currentSequence.nbCardsToShow + 1
+                )}
+                disabled={!curPlayer.master}
+              >
+                Suite
+              </button>
+              <button
+                onClick={() => ws.wsSetCurrentSequence()}
+                disabled={!curPlayer.master}
+              >
+                Choisir une autre séquence
+              </button>
+            </div>
             {
               gameData.gameState.currentSequence.sequence.sequence
                 .slice(1, gameData.gameState.currentSequence.nbCardsToShow)

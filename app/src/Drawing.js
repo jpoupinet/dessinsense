@@ -1,12 +1,15 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Stage, Layer, Line, Circle } from 'react-konva';
 
 const Drawing = props => {
   const [tool, setTool] = useState('pen');
   const [lines, setLines] = useState([]);
   const [circles, setCircles] = useState([]);
+  const [stageWidth, setStageWidth] = useState(0);
+  const [stageHeight, setStageHeight] = useState(0);
   const isDrawing = useRef(false);
   const stageRef = useRef(null);
+  const stageContainerRef = useRef(null);
   
   const handleMouseDown = e => {
     isDrawing.current = true;
@@ -36,13 +39,20 @@ const Drawing = props => {
   const handleSubmit = () => {
     props.submit(stageRef.current.toDataURL());
   };
-  
+
+  useEffect(() => {
+    setStageWidth(stageContainerRef.current.clientWidth);
+    setStageHeight(
+      stageContainerRef.current.clientHeight - (stageContainerRef.current.clientHeight / 10)
+    );
+  }, []);
+
   return (
-    <div>
-      <div className="card">
+    <div style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
+      <div ref={stageContainerRef} className="card" style={{ height: '100%', flex: 1 }}>
         <Stage
-          width={600}
-          height={350}
+          width={stageWidth}
+          height={stageHeight}
           onMouseDown={handleMouseDown}
           onMousemove={handleMouseMove}
           onMouseup={handleMouseUp}
@@ -78,7 +88,7 @@ const Drawing = props => {
           </Layer>
         </Stage>
       </div>
-      <button id="submitDessin" onClick={handleSubmit}>Envoyer</button>
+      <button id="submitDessin" className="btnValider" onClick={handleSubmit}>Envoyer</button>
     </div>
   );
 }
