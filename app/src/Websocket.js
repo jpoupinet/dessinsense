@@ -47,10 +47,6 @@ export default function Websocket({ children }) {
     socket.emit('archiveCurrentGame');
   };
 
-  const wsExitGame = () => {
-    socket.emit('disconnect');
-  };
-
   if (!socket) {
     socket = io.connect(API_URL);
 
@@ -68,8 +64,7 @@ export default function Websocket({ children }) {
       wsStartGame,
       wsSubmitCard,
       wsSetCurrentSequence,
-      wsArchiveCurrentGame,
-      wsExitGame
+      wsArchiveCurrentGame
     };
   }
 

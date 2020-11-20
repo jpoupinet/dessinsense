@@ -240,12 +240,7 @@ const Game = () => {
                 >
                   Archiver la partie
                 </button>
-                <button onClick={() => {
-                  ws.wsExitGame();
-                  setRedirect('/');
-                }}>
-                  Retour à la page d'accueil
-                </button>
+                <button onClick={() => setRedirect('/')}>Retour à la page d'accueil</button>
               </div>
             }
           </div>
