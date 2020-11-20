@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Redirect } from 'react-router-dom';
-import { Stage, Layer, Line, Circle } from 'react-konva';
 
 import { API_URL } from './config';
 
@@ -35,10 +34,10 @@ const Archives = () => {
   });
   
   return (
-    <div>
+    <div id="archives">
       { redirect.trim().length > 0 && <Redirect to={redirect} /> }
       <h1>Parties archivées</h1>
-      <div>
+      <div className="boutonsSequences">
         {
           !gameName && games &&
             games.map((g, i) =>
@@ -56,12 +55,6 @@ const Archives = () => {
                 `}
               </button>
             )
-        }
-        {
-          !gameName &&
-          <div>
-            <button onClick={() => setRedirect('/')}>Retourner à l'accueil</button>
-          </div>
         }
         {
           gameName && gameData && !currentSequence &&
@@ -100,30 +93,7 @@ const Archives = () => {
                       <div key={'seq' + seq.submitterId}>
                         <p className="bold">Dessin de {seq.submitterName}</p>
                         <div className="card">
-                          <Stage width={600} height={350}>
-                            <Layer>
-                              {seq.value.lines.map((line, i) => (
-                                <Line
-                                  key={`line${i}`}
-                                  points={line.points}
-                                  stroke="#0a0a0a"
-                                  strokeWidth={3}
-                                  tension={0.5}
-                                  lineCap="round"
-                                  globalCompositeOperation={'source-over'}
-                                />
-                              ))}
-                              {seq.value.circles.map((circle, i) => (
-                                <Circle
-                                  key={`circle${i}`}
-                                  x={circle.x}
-                                  y={circle.y}
-                                  fill="0a0a0a"
-                                  radius={2}
-                                />
-                              ))}
-                            </Layer>
-                          </Stage>
+                          <img src={seq.value} alt="Dessin séquence" />
                         </div>
                       </div>
                     );
@@ -133,7 +103,9 @@ const Archives = () => {
                   return (
                     <div key={'seq' + seq.submitterId}>
                       <p className="bold">Phrase de {seq.submitterName}</p>
-                      <p className="card">{seq.value}</p>
+                      <div className="card">
+                        <p>{seq.value}</p>
+                      </div>
                     </div>
                   );
                 })
@@ -142,6 +114,9 @@ const Archives = () => {
             </div>
         }
       </div>
+      <button onClick={() => setRedirect('/')} style={{ marginTop: '20px' }}>
+        Retourner à l'accueil
+      </button>
     </div>
   );
 };

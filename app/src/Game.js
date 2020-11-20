@@ -1,7 +1,6 @@
 import React, { useState, useContext } from 'react';
 import { useParams, Redirect } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
-import { Stage, Layer, Line, Circle } from 'react-konva';
 
 import Drawing from './Drawing';
 import PlayerList from './PlayerList';
@@ -253,7 +252,7 @@ const Game = () => {
           gameData.gameState.currentSequence &&
           <div>
             <h2>Séquence de {gameData.gameState.currentSequence.sequence.playerName}</h2>
-            <div id="boutonsSequences">
+            <div className="boutonsSequences">
               <button
                 style={{
                   display: gameData.gameState.currentSequence.nbCardsToShow >= 
