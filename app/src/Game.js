@@ -165,8 +165,8 @@ const Game = () => {
                       onChange={handleTextCard}
                     />
                   </div>
+                  <input className="btnValider" type="submit" value="Envoyer" />
                 </div>
-                <input className="btnValider" type="submit" value="Envoyer" />
               </form>
             </div>
         }
