@@ -86,10 +86,15 @@ const Drawing = props => {
           </Layer>
         </Stage>
       </div>
-      <button onClick={() => {
-        setLines([]);
-        setCircles([]);
-      }}>Effacer le dessin</button>
+      <button
+        className="btnEffacer"
+        onClick={() => {
+          setLines([]);
+          setCircles([]);
+        }}
+      >
+        Effacer le dessin
+      </button>
       <button id="submitDessin" className="btnValider" onClick={handleSubmit}>Envoyer</button>
     </div>
   );

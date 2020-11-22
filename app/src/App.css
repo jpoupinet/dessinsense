@@ -169,3 +169,7 @@ button, input[type=submit] {
 .btnValider {
   background-color: rgb(140, 236, 140);
 }
+
+.btnEffacer {
+  background-color: rgb(252, 174, 57);
+}
