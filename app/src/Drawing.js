@@ -43,7 +43,7 @@ const Drawing = props => {
   useEffect(() => {
     setStageWidth(stageContainerRef.current.clientWidth);
     setStageHeight(
-      stageContainerRef.current.clientHeight - (stageContainerRef.current.clientHeight / 10)
+      stageContainerRef.current.clientHeight - (stageContainerRef.current.clientHeight / 20)
     );
   }, []);
 
