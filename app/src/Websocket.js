@@ -58,6 +58,10 @@ export default function Websocket({ children }) {
       dispatch(updateGameData(gameData));
     });
 
+    socket.on('reconnect', () => {
+      socket.emit('userReconnect');
+    });
+
     ws = {
       socket,
       wsConnectToRoom,

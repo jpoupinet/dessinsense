@@ -242,6 +242,20 @@ io.on('connection', socket => {
     writeGameData(socket.idGame, gameData, true);
   });
 
+  socket.on('userReconnect', () => {
+    if (!socket.idGame) return;
+
+    let gameData = getGameData(socket.idGame);
+    const playerIndex = gameData.players.findIndex(player =>
+      player.id === socket.playerId
+    );
+    
+    if (playerIndex > -1) gameData.players[playerIndex].online = true;
+
+    writeGameData(socket.idGame, gameData);
+    io.sockets.in(socket.idGame).emit('gameStateChange', gameData);
+  });
+
   socket.on('disconnect', () => {
     if (!socket.idGame) return;
 
