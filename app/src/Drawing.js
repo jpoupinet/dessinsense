@@ -37,6 +37,7 @@ const Drawing = props => {
   };
 
   const handleSubmit = () => {
+    if (!lines.length > 0 && !circles.length > 0) return;
     props.submit(stageRef.current.toDataURL());
   };
 
@@ -86,6 +87,7 @@ const Drawing = props => {
           </Layer>
         </Stage>
       </div>
+      <button id="submitDessin" className="btnValider" onClick={handleSubmit}>Envoyer</button>
       <button
         className="btnEffacer"
         onClick={() => {
@@ -95,7 +97,6 @@ const Drawing = props => {
       >
         Effacer le dessin
       </button>
-      <button id="submitDessin" className="btnValider" onClick={handleSubmit}>Envoyer</button>
     </div>
   );
 }

@@ -72,6 +72,8 @@ const Game = () => {
   };
 
   const handleSubmitTextCard = event => {
+    if (!card.trim().length > 0) return; 
+
     event.preventDefault();
     ws.wsSubmitCard(card);
     setCard('');
